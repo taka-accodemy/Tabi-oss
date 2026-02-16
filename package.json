@@ -1,0 +1,14 @@
+{
+  "name": "tabi-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "clean": "rm -rf node_modules packages/*/node_modules apps/*/node_modules"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}

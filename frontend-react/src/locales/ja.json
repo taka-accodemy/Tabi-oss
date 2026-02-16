@@ -1,0 +1,72 @@
+{
+  "auth": {
+    "sign_in_prompt": "データ分析を始めるにはサインインしてください",
+    "login_failed": "ログインに失敗しました。もう一度お試しください。",
+    "google_error": "Googleサインインに失敗しました。もう一度お試しください。",
+    "logout": "サインアウト"
+  },
+  "app": {
+    "title": "Tabi - ChatBI (Vanna Powered)",
+    "welcome": "こんにちは！TaBI Assistant です。どのようなデータ分析をお手伝いしましょうか？",
+    "placeholder": "「先月の国別売上を教えて」など、質問を入力してください...",
+    "send": "送信",
+    "sql_query": "SQL クエリ",
+    "showing_rows": "{{current}} / {{total}} 行を表示中",
+    "scroll_more": "スクロールして全件表示",
+    "error_occurred": "エラーが発生しました",
+    "connection_failed": "サーバーとの通信に失敗しました",
+    "communication_error": "通信エラー"
+  },
+  "settings": {
+    "title": "AI セマンティック設定",
+    "description": "Cube.js のメジャーやディメンションの意味を定義して、分析精度を向上させます。",
+    "tabs": {
+      "database": "データベース接続",
+      "schema": "スキーマ定義 (Cube.js)",
+      "language": "言語設定"
+    },
+    "database": {
+      "type": "データベースの種類",
+      "host": "ホスト名",
+      "port": "ポート",
+      "dbname": "データベース名",
+      "user": "ユーザー名",
+      "password": "パスワード",
+      "project_id": "プロジェクト ID",
+      "dataset_id": "データセット ID",
+      "credentials": "認証情報 (JSON/ファイル)",
+      "uploaded": "アップロード済み",
+      "region": "リージョン (AWS Region)",
+      "s3_staging": "S3 ステージングパス",
+      "workgroup": "ワークグループ",
+      "save": "接続設定を保存",
+      "maintenance": "メンテナンス",
+      "reset_description": "AIの学習内容に矛盾が生じている場合や、最初からやり直したい場合は学習内容をリセットできます。",
+      "reset_button": "AIの学習内容をリセット",
+      "reset_confirm": "全てのAI学習内容をリセットしますか？この操作は取り消せません。"
+    },
+    "schema": {
+      "info_box": "各項目の「AI向け説明」や「ポラリティ（値の良し悪し）」を設定してください。AIがビジネスルールとして学習します。",
+      "column_name": "名称 / タイプ",
+      "current_desc": "現在の説明",
+      "ai_desc": "AI向け説明 (保存用)",
+      "ai_desc_placeholder": "AIにこの項目の背景を教える...",
+      "polarity": "ポラリティ",
+      "no_desc": "説明なし",
+      "polarity_positive": "高良",
+      "polarity_negative": "低良",
+      "polarity_neutral": "中立",
+      "save_and_train": "変更を保存してAIに反映",
+      "no_changes": "保存する変更がありません",
+      "save_success": "AIのセマンティック情報を保存し、学習しました",
+      "save_failed": "保存に失敗しました",
+      "reset_success": "AIエンジンをリセットしました",
+      "reset_failed": "リセットに失敗しました"
+    },
+    "language": {
+      "select": "言語を選択",
+      "en": "English",
+      "ja": "日本語"
+    }
+  }
+}

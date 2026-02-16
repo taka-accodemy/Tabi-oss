@@ -1,0 +1,198 @@
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: chatbi-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-chatbi}
+      POSTGRES_USER: ${POSTGRES_USER:-chatbi_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-chatbi_password}
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - chatbi-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chatbi_user -d chatbi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: chatbi-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - chatbi-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Cube.js Server
+  cube:
+    image: cubejs/cube:latest
+    container_name: chatbi-cube
+    ports:
+      - "4000:4000"
+    environment:
+      CUBEJS_DB_TYPE: postgres
+      CUBEJS_DB_HOST: postgres
+      CUBEJS_DB_NAME: ${POSTGRES_DB:-chatbi}
+      CUBEJS_DB_USER: ${POSTGRES_USER:-chatbi_user}
+      CUBEJS_DB_PASS: ${POSTGRES_PASSWORD:-chatbi_password}
+      CUBEJS_DB_PORT: 5432
+      CUBEJS_API_SECRET: ${CUBE_API_SECRET:-chatbi-cube-secret-key-change-in-production}
+      CUBEJS_DEV_MODE: true
+      CUBEJS_WEB_SOCKETS: true
+      CUBEJS_CACHE_AND_QUEUE_DRIVER: memory
+      CUBEJS_REDIS_URL: redis://redis:6379
+      NODE_ENV: development
+    volumes:
+      - ./backend/cube_schemas:/cube/conf/schema
+      - ./backend/cube.js:/cube/conf/cube.js
+    networks:
+      - chatbi-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-no-verbose", "--tries=1", "--spider", "http://localhost:4000/livez"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: chatbi-backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-chatbi_user}:${POSTGRES_PASSWORD:-chatbi_password}@postgres:5432/${POSTGRES_DB:-chatbi}
+      REDIS_URL: redis://redis:6379
+      CUBE_API_URL: http://cube:4000
+      CUBE_API_SECRET: ${CUBE_API_SECRET:-chatbi-cube-secret-key-change-in-production}
+      SECRET_KEY: ${SECRET_KEY:-your-secret-key-here-change-in-production}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ENVIRONMENT: development
+      DEBUG: true
+    volumes:
+      - ./backend:/app
+    networks:
+      - chatbi-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      cube:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend-react
+      dockerfile: Dockerfile
+    container_name: chatbi-frontend
+    ports:
+      - "5173:80"
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000/api/v1
+    networks:
+      - chatbi-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: chatbi-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    networks:
+      - chatbi-network
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+    profiles:
+      - production
+
+  # Monitoring - Prometheus (Optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: chatbi-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - chatbi-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Monitoring - Grafana (Optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: chatbi-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - chatbi-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+networks:
+  chatbi-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:

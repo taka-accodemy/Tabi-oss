@@ -1,0 +1,72 @@
+{
+  "auth": {
+    "sign_in_prompt": "Sign in to start analyzing your data",
+    "login_failed": "Login failed. Please try again.",
+    "google_error": "Google sign-in failed. Please try again.",
+    "logout": "Sign out"
+  },
+  "app": {
+    "title": "Tabi - ChatBI (Vanna Powered)",
+    "welcome": "Hello! I am Tabi Assistant. How can I help you with your data analysis today?",
+    "placeholder": "Enter your question, e.g., 'Show me last month's sales by country'...",
+    "send": "Send",
+    "sql_query": "SQL Query",
+    "showing_rows": "Showing {{current}} of {{total}} rows",
+    "scroll_more": "Scroll for more results",
+    "error_occurred": "An error occurred",
+    "connection_failed": "Failed to communicate with server",
+    "communication_error": "Communication Error"
+  },
+  "settings": {
+    "title": "AI Semantic Settings",
+    "description": "Define meanings for Cube.js measures and dimensions to improve analysis accuracy.",
+    "tabs": {
+      "database": "Database Connection",
+      "schema": "Schema Definition (Cube.js)",
+      "language": "Language Settings"
+    },
+    "database": {
+      "type": "Database Type",
+      "host": "Host",
+      "port": "Port",
+      "dbname": "Database Name",
+      "user": "User",
+      "password": "Password",
+      "project_id": "Project ID",
+      "dataset_id": "Dataset ID",
+      "credentials": "Credentials (JSON/File)",
+      "uploaded": "Uploaded",
+      "region": "Region (AWS Region)",
+      "s3_staging": "S3 Staging Path",
+      "workgroup": "Workgroup",
+      "save": "Save Connection Settings",
+      "maintenance": "Maintenance",
+      "reset_description": "Reset AI training if you notice inconsistencies or want to start over.",
+      "reset_button": "Reset AI Training Data",
+      "reset_confirm": "Are you sure you want to reset all AI training data? This action cannot be undone."
+    },
+    "schema": {
+      "info_box": "Define 'AI Descriptions' and 'Polarity' for each item. The AI will learn these as business rules.",
+      "column_name": "Name / Type",
+      "current_desc": "Current Description",
+      "ai_desc": "AI Description (Persistent)",
+      "ai_desc_placeholder": "Teach AI about this item...",
+      "polarity": "Polarity",
+      "no_desc": "No description",
+      "polarity_positive": "Pos",
+      "polarity_negative": "Neg",
+      "polarity_neutral": "Neut",
+      "save_and_train": "Save Changes and Train AI",
+      "no_changes": "No changes to save",
+      "save_success": "Saved semantic info and trained AI",
+      "save_failed": "Failed to save",
+      "reset_success": "AI engine reset successfully",
+      "reset_failed": "Failed to reset"
+    },
+    "language": {
+      "select": "Select Language",
+      "en": "English",
+      "ja": "Japanese"
+    }
+  }
+}
